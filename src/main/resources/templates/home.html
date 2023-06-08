@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<head>
+    <title>Home page</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<p>
+    <span text="List of matches"></span>
+</p>
+
+<button class="sort-button sort-button--start">Отсортировать по возрастанию</button>
+    <table id="results" border="1">
+        <thead>
+            <tr>
+                <th>Вид спорта</th>
+                <th>Турнир</th>
+                <th>Команда 1</th>
+                <th>Команда 2</th>
+                <th>Время начала матча</th>
+                <th>Ссылка на событие</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="match : ${matches}">
+                <td th:text="${match.sportsType}"></td>
+                <td th:text="${match.tournamentName}"></td>
+                <td th:text="${match.firstParticipant}"></td>
+                <td th:text="${match.secondParticipant}"></td>
+                <td th:text="${match.startingTime}"></td>
+                <td><a th:href="${match.matchLink}">Ссылка на событие</a></td>
+            </tr>
+        </tbody>
+        </table>
+
+<script>
+    function convertDate(date) {
+        date = date.replace(" ","T")
+        const year = "1980.";
+        date = year+date+":00";
+        date = date.replaceAll(".", "-")
+        return Date.parse(date);
+    }
+
+    function sortByDate(direction) {
+        var tbody = document.querySelector("#results tbody");
+
+        var rows = [].slice.call(tbody.querySelectorAll("tr"));
+
+
+        if (direction === 'asc') {
+            document.querySelector(".sort-button").classList.remove('sort-button--start');
+            document.querySelector(".sort-button").classList.add('sort-button--end');
+
+
+            rows.sort(function (a, b) {
+                return (
+                    convertDate(b.cells[4].innerHTML) -
+                    convertDate(a.cells[4].innerHTML)
+                );
+            });
+        } else {
+            document.querySelector(".sort-button").classList.add('sort-button--start');
+            document.querySelector(".sort-button").classList.remove('sort-button--end');
+
+            rows.sort(function (a, b) {
+                return (
+                    convertDate(a.cells[4].innerHTML) -
+                    convertDate(b.cells[4].innerHTML)
+                );
+            });
+        }
+
+        rows.forEach(function (v) {
+            tbody.appendChild(v);
+        });
+    }
+
+    document.querySelector(".sort-button").addEventListener("click", () => {
+        if (document.querySelector(".sort-button").classList.contains('sort-button--start')) {
+            document.querySelector(".sort-button").innerText = "Отсортировать по возрастанию";
+
+            sortByDate('asc');
+        } else {
+            document.querySelector(".sort-button").innerText = "Отсортировать по убыванию";
+
+            sortByDate('desc');
+        }
+    });
+</script>
+</body>
+</html>
